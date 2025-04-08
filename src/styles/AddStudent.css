@@ -1,0 +1,261 @@
+/* 🎓 AddStudent - Container */
+.add-student-container {
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fefefe;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+}
+
+.add-student-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+/* 🚥 Stepper */
+.stepper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.step .circle {
+  width: 36px;
+  height: 36px;
+  background: #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.step.active {
+  color: #191919;
+}
+
+.step.active .circle {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* 🧾 Form */
+.student-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.student-form label {
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+  color: #444;
+  width: 100%;
+  text-align: left;
+}
+
+.student-form input,
+.student-form select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #191919;
+  transition: border 0.3s ease;
+}
+
+.student-form input:focus,
+.student-form select:focus {
+  outline: none;
+  border-color: #191919;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* 🔻 Error Text */
+.error-text {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* ✅ Submit Button */
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.form-footer.center {
+  justify-content: center;
+}
+
+.submit-btn {
+  padding: 0.6rem 1.4rem;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #db282b;
+}
+
+.submit-btn[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 🪟 Modal */
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1rem;
+}
+
+.custom-modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.student-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.modal-text {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.custom-modal-close {
+  background: #ff4d4f;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.custom-modal-close:hover {
+  background: #db282b;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 📱 Responsive Design */
+@media screen and (max-width: 768px) {
+  .add-student-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .stepper {
+    gap: 1rem;
+  }
+
+  .step .circle {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .step {
+    font-size: 0.85rem;
+  }
+
+  .form-footer {
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .add-student-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .student-form input,
+  .student-form select {
+    border: 1px solid #ccc;
+    color: #191919;
+    font-size: 0.95rem;
+    padding: 0.5rem;
+  }
+  .submit-btn {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .custom-modal-content {
+    padding: 1.2rem;
+  }
+
+  .student-name {
+    font-size: 1.2rem;
+  }
+
+  .modal-text {
+    font-size: 0.95rem;
+  }
+
+  .custom-modal-close {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+}
