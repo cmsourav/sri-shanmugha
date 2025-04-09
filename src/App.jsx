@@ -7,7 +7,6 @@ import AddStudent from "./pages/AddStudentPage";
 import StudentList from "./pages/StudentListPage";
 import Dashboard from "./pages/Dashboard";
 import MainLayout from "./pages/MainLayout";
-import CollegePage from "./pages/CollegePage";
 import SignupPage from "./pages/SignupPage";
 
 function App() {
@@ -21,7 +20,6 @@ function App() {
         <Route path="/dashboard" element={<MainLayout><Dashboard /></MainLayout>} />
         <Route path="/add-student" element={<MainLayout><AddStudent /></MainLayout>} />
         <Route path="/student-list" element={<MainLayout><StudentList /></MainLayout>} />
-        <Route path="/add-college" element={<MainLayout><CollegePage /></MainLayout>} />
       </Routes>
     </Router>
   );

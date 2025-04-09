@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import "../styles/Dashboard.css";
+import logo from "../assets/sidebar-logo.png"
 
 const MainLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,12 +15,12 @@ const MainLayout = ({ children }) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/", { replace: true }); 
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
-  
+
 
   const handleOutsideClick = (e) => {
     if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
@@ -51,17 +52,19 @@ const MainLayout = ({ children }) => {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`} ref={sidebarRef}>
-        <div className="sidebar-logo">KM Foundation</div>
+        <div className="sidebar-logo">
+          <img src={logo} alt="Sri Shanmugha Logo" className="logo-image" />
+          <p>Sri Shanmugha Group</p>
+        </div>
         <nav className="sidebar-menu">
           <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>Dashboard</Link>
           <Link to="/add-student" className={location.pathname === "/add-student" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>Add Student</Link>
           <Link to="/student-list" className={location.pathname === "/student-list" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>View Students</Link>
-          <Link to="/add-college" className={location.pathname === "/add-college" ? "active" : ""} onClick={() => setIsSidebarOpen(false)}>Add College</Link>
         </nav>
 
         <div className="logout-container">
           <button className="logout-btn" onClick={handleLogout}>
-            🔒 Logout
+            Logout
           </button>
         </div>
       </aside>

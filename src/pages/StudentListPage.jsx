@@ -5,8 +5,11 @@ import {
     doc,
     updateDoc,
     deleteDoc,
+    query,
+    where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import "../styles/StudentList.css";
 
 const StudentList = () => {
@@ -28,12 +31,17 @@ const StudentList = () => {
     const [collegeFilter, setCollegeFilter] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
-    const studentsPerPage = 8;
+    const studentsPerPage = 9;
 
     useEffect(() => {
-        const fetchStudents = async () => {
+        const fetchStudents = async (user) => {
             try {
-                const snapshot = await getDocs(collection(db, "students"));
+                const q = query(
+                    collection(db, "shanmugha"),
+                    where("createdBy", "==", user.uid)
+                );
+                const snapshot = await getDocs(q);
+
                 const list = snapshot.docs.map((doc) => {
                     const data = doc.data();
                     const createdAt = data.createdAt?.toDate?.();
@@ -69,7 +77,17 @@ const StudentList = () => {
             }
         };
 
-        fetchStudents();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchStudents(user);
+            } else {
+                setLoading(false);
+                setStudents([]);
+                setFilteredStudents([]);
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     useEffect(() => {
@@ -77,7 +95,7 @@ const StudentList = () => {
 
         if (searchTerm)
             filtered = filtered.filter((s) =>
-                s.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
+                s.candidateName?.toLowerCase().includes(searchTerm.toLowerCase())
             );
 
         if (statusFilter)
@@ -132,22 +150,6 @@ const StudentList = () => {
         }
     };
 
-    const confirmDeleteStudent = (id) => {
-        setStudentToDelete(id);
-        setShowDeleteModal(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-        try {
-            await deleteDoc(doc(db, "students", studentToDelete));
-            setStudents((prev) => prev.filter((s) => s.id !== studentToDelete));
-            setShowDeleteModal(false);
-        } catch (err) {
-            alert("Failed to delete student.");
-            console.error(err);
-        }
-    };
-
     return (
         <div className="student-list-container">
             <h1>All Students</h1>
@@ -162,7 +164,7 @@ const StudentList = () => {
                 <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                     <option value="">Application Status</option>
                     <option value="Enquiry">Enquiry</option>
-                    <option value="Enrolled">Enrolled</option>
+                    <option value="Enroll">Enrolled</option>
                 </select>
                 <input
                     type="text"
@@ -190,12 +192,12 @@ const StudentList = () => {
                                 <div className="card-header">
                                     <h3>{s.candidateName}</h3>
                                     <span
-                                        className={`status-badge ${s.applicationStatus === "Enrolled"
-                                                ? "confirmed"
-                                                : "enquiry"
+                                        className={`status-badge ${s.applicationStatus === "Enroll"
+                                            ? "confirmed"
+                                            : "enquiry"
                                             }`}
                                     >
-                                        {s.applicationStatus}
+                                        {s.applicationStatus === "Enroll" ? "Enrolled" : s.applicationStatus}
                                     </span>
                                 </div>
                                 <p>
@@ -214,15 +216,7 @@ const StudentList = () => {
                                     >
                                         ✏️
                                     </button>
-                                    <button
-                                        className="icon-btn delete-btn"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            confirmDeleteStudent(s.id);
-                                        }}
-                                    >
-                                        🗑️
-                                    </button>
+
                                 </div>
                             </div>
                         ))}
@@ -344,7 +338,8 @@ const StudentList = () => {
                                 Place: selectedStudent.place,
                                 "Amount Paid": selectedStudent.amountPaid,
                                 "Transaction ID": selectedStudent.transactionId,
-                                Reference: selectedStudent.reference,
+                                Reference: selectedStudent.reference.userName,
+                                "Consultancy Name": selectedStudent.reference.consultancyName,
                                 Status: selectedStudent.applicationStatus,
                                 "Created At": selectedStudent.createdAt,
                             }).map(([label, value]) => (
