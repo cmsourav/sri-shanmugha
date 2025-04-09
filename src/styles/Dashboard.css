@@ -8,7 +8,7 @@
   html {
     font-family: 'Segoe UI', sans-serif;
     background-color: #f4f6f9;
-    background-image: url('https://res.cloudinary.com/da82lkb5h/image/upload/v1743944408/Dashboard_Background_w1qc1i.jpg');
+    background-image: url('https://res.cloudinary.com/da82lkb5h/image/upload/v1744120717/SRI_SHANMUGHA_Dashboard_ptcaiu.jpg');
   }
   
   .dashboard {
@@ -18,7 +18,7 @@
   }
   
   .sidebar {
-    width: 240px;
+    width: 300px;
     background-color: #272727;
     color: #fff;
     padding: 2rem 1rem;
@@ -37,6 +37,12 @@
     text-align: center;
     margin-bottom: 2rem;
     color: #fff;
+  }
+
+  .logo-image {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
   }
   
   .sidebar-menu {
@@ -105,6 +111,7 @@
   
   .student-table {
     background-color: white;
+    width: 95%;
     border-radius: 10px;
     padding: 1rem 1.5rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
@@ -243,21 +250,21 @@
   background-color: #ff7875;
 }
 .pagination {
-  margin-top: 1rem;
   display: flex;
-  gap: 0.5rem;
   justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
 
 .pagination button {
-  background-color: #f0f0f0;
+  padding: 0.4rem 0.8rem;
   border: none;
-  padding: 0.5rem 0.9rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  background-color: #f0f0f0;
   cursor: pointer;
-  transition: 0.2s;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background 0.2s;
 }
 
 .pagination button:hover {
@@ -265,9 +272,15 @@
 }
 
 .pagination button.active {
-  color: #242424;
-  font-weight: bold;
+  background-color: #1f5fa9;
+  color: white;
 }
+
+.pagination button:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
 
 /* Hide mobile message on desktop */
 .mobile-table-disabled {
@@ -281,6 +294,10 @@
 /* Hide the table and show message on mobile */
 @media (max-width: 600px) {
   .table-wrapper {
+    display: none;
+  }
+
+  .pagination {
     display: none;
   }
 

@@ -1,6 +1,5 @@
-/* 🎓 AddStudent - Container */
 .add-student-container {
-  max-width: 450px;
+  max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
   background: #fefefe;
@@ -78,7 +77,7 @@
 
 .student-form input,
 .student-form select {
-  width: 100%;
+  width: 95%;
   padding: 0.6rem;
   border: 1px solid #ccc;
   border-radius: 6px;
