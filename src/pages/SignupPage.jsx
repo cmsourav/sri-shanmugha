@@ -179,6 +179,7 @@ const SignupPage = () => {
                 </div>
 
                 <div className="signup-right">
+                <div className="signup-cardbg">
                     <h2 className="signup-heading">Sign Up</h2>
                     <form className="signup-form" onSubmit={handleSubmit}>
                         <div className="form-row">
@@ -329,6 +330,7 @@ const SignupPage = () => {
 
                         <p className="login-redirect">Already have an account? <a href="/">Sign in</a></p>
                     </form>
+                </div>
                 </div>
             </div>
         </PageTransitionWrapper>
