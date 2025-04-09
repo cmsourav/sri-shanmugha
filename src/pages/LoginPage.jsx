@@ -37,7 +37,7 @@ const LoginPage = () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate("/dashboard");
+            navigate('/dashboard', { replace: true });
         } catch (err) {
             switch (err.code) {
                 case "auth/user-not-found":

@@ -144,7 +144,7 @@ const SignupPage = () => {
             await setDoc(doc(db, "users", user.uid), userData);
 
             toast.success("Signup successful!");
-            navigate("/dashboard");
+            navigate('/dashboard', { replace: true });
 
             setFormData({
                 fullName: "",
