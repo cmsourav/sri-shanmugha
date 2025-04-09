@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import PageTransitionWrapper from "../components/PageTransitionWrapper";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -54,6 +55,7 @@ const LoginPage = () => {
     };
 
     return (
+        <PageTransitionWrapper direction="left">
         <div className="login-container">
             <div className="login-card">
                 <h2 className="login-title">Login</h2>
@@ -91,6 +93,7 @@ const LoginPage = () => {
                 </form>
             </div>
         </div>
+        </PageTransitionWrapper>
     );
 };
 
