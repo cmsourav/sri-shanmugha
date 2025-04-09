@@ -209,7 +209,7 @@ const AddStudent = () => {
     studentData.createdAt = Timestamp.now();
 
     try {
-      const studentRef = doc(db, "students", student.studentId);
+      const studentRef = doc(db, "shanmugha", student.studentId);
       await setDoc(studentRef, studentData);
       setSubmissionStatus("idle");
 
