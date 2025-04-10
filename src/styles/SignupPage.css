@@ -1,4 +1,3 @@
-
 .signup-wrapper {
     display: flex;
     height: 100vh;
@@ -29,23 +28,32 @@
     transition: all 0.3s ease-in-out;
 }
 
+
 .signup-heading {
     font-size: 2rem;
     color: #143f70;
     font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.signup-subheading {
+    font-size: 0.9rem;
+    color: #666;
     margin-bottom: 2rem;
+    text-align: center;
 }
 
 .signup-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .form-row {
     display: flex;
     gap: 1rem;
-    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
     flex-wrap: wrap;
 }
 
@@ -53,87 +61,101 @@
     position: relative;
     flex: 1;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     background: #fff;
-    border-radius: 6px;
-    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    padding: 0.8rem;
     transition: all 0.3s ease;
-    border: 1px solid #ccc;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    min-width: 200px;
 }
 
-.input-group:hover {
-    border-color: #242424;
-    background-color: #f9f9f9;
+.input-group.has-error {
+    border-color: #e53e3e;
+}
+
+.input-field-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .input-icon {
-    margin-right: 0.5rem;
+    margin-right: 0.8rem;
     color: #d4d2d2;
     font-size: 1rem;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
     border: none;
     background: transparent;
     outline: none;
     width: 100%;
-    font-size: 13px;
+    font-size: 14px;
     color: #333;
 }
 
-.input-group input::placeholder {
+.input-group input::placeholder,
+.input-group select option:disabled {
     color: #aaa;
-    font-size: 12px;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: #191919;
-}
-
-.form-input {
-    width: 100%;
-    border: none;
-    outline: none;
-    padding: 3px;
+    font-size: 13px;
 }
 
 .error {
-    font-size: 0.6rem;
-    color: #d92626;
-    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    color: #e53e3e;
+    margin-top: 0.25rem;
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding-left: 1.8rem;
 }
 
 .register-button {
-    padding: 0.75rem;
-    background-color: #143f70;
+    padding: 1rem;
+    background-color: #133c6a;
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 8px rgba(20, 63, 112, 0.2);
 }
 
 .register-button:hover {
     background-color: #133c6a;
+    transform: translateY(-1px);
+}
+
+.register-button:active {
+    transform: translateY(0);
+}
+
+.register-button:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
 }
 
 .login-redirect {
     text-align: center;
-    margin-top: 1rem;
-    font-size: 0.95rem;
-    color: #444;
+    margin-top: .5rem;
+    font-size: 0.9rem;
+    color: #666;
 }
 
-.login-redirect a {
+.login-link {
     color: #143f70;
-    text-decoration: underline;
-    font-weight: bold;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.3rem;
 }
 
-.login-redirect a:hover {
+.login-link:hover {
     text-decoration: underline;
 }
 
@@ -144,15 +166,16 @@
     }
 
     .signup-left {
-        height: 250px;
+        height: 200px;
     }
 
     .signup-right {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     .form-row {
         flex-direction: column;
+        gap: 0.5rem;
     }
 }
 
@@ -160,44 +183,63 @@
     .signup-left {
         display: none;
     }
-    .signup-heading {
-        font-size: 1.25rem;
-    }
-    .signup-right{
-        /* min-height: 100vh; */
-        background-image: url('https://res.cloudinary.com/da82lkb5h/image/upload/v1744122437/Shanmugha_User_login_Phone_View_lr9ebk.jpg');
+    
+    .signup-right {
+        background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), 
+                          url('https://res.cloudinary.com/da82lkb5h/image/upload/v1744122437/Shanmugha_User_login_Phone_View_lr9ebk.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        display: flex;
-        justify-content: center;
-        align-items: center;
         padding: 1rem;
-        position: relative;
     }
+    
     .signup-cardbg {
-        background-color: #ffffffcd;
-        max-width: 90%;
-        padding: 24px;
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 100%;
+        padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .signup-heading {
+        font-size: 1.5rem;
+    }
+    
+    .signup-subheading {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+        padding: 0.7rem;
+    }
+
+    .error {
+        font-size: 0.7rem;
+        padding-left: 1.5rem;
     }
 
     .register-button {
-        padding: 0.5rem;
-        font-size: 0.95rem;
+        padding: 0.9rem;
     }
 
-    .input-group input {
-        font-size: 0.95rem;
-    }
     .login-redirect {
-        margin-top: 6px;
-        margin-bottom: 10px;
-        font-size: .8rem;
-        display: block;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .signup-cardbg {
+        padding: 1.2rem;
+    }
+    
+    .signup-heading {
+        font-size: 1.4rem;
+    }
+    
+    .input-group {
+        min-width: 100%;
     }
 }
