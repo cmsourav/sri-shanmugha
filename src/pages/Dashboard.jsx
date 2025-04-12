@@ -328,20 +328,20 @@ const Dashboard = () => {
             <span className="detail-value">{selectedStudent.course}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Email:</span>
-            <span className="detail-value">{selectedStudent.email || 'N/A'}</span>
+            <span className="detail-label">College:</span>
+            <span className="detail-value">{selectedStudent.college || 'N/A'}</span>
           </div>
         </div>
         
         <div className="detail-card">
           <h4>Contact Information</h4>
           <div className="detail-row">
-            <span className="detail-label">Phone:</span>
-            <span className="detail-value">{selectedStudent.phone || 'N/A'}</span>
+            <span className="detail-label">Father Name:</span>
+            <span className="detail-value">{selectedStudent.fatherName || 'N/A'}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Address:</span>
-            <span className="detail-value">{selectedStudent.address || 'N/A'}</span>
+            <span className="detail-label">Parent Number:</span>
+            <span className="detail-value">{selectedStudent.parentNumber || 'N/A'}</span>
           </div>
         </div>
       </div>
