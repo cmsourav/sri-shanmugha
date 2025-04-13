@@ -1,260 +1,401 @@
-.add-student-container {
-  max-width: 400px;
+/* Modern UI Styles with add_student_ prefix */
+.add_student_container {
+  max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background: #fefefe;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding-bottom: 5rem;
 }
 
-.add-student-container h2 {
+.add_student_header {
   text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
-  color: #333;
-}
-
-/* 🚥 Stepper */
-.stepper {
-  display: flex;
-  justify-content: center;
   margin-bottom: 2rem;
-  gap: 2rem;
-  flex-wrap: wrap;
 }
 
-.step {
+.add_student_header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.add_student_header p {
+  color: #718096;
+  font-size: 1rem;
+}
+
+/* Stepper */
+.add_student_stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.add_student_step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #999;
-  font-size: 0.9rem;
+  z-index: 2;
 }
 
-.step .circle {
+.add_student_step_number {
   width: 36px;
   height: 36px;
-  background: #ccc;
   border-radius: 50%;
+  background-color: #e2e8f0;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.step.active {
-  color: #191919;
-}
-
-.step.active .circle {
-  background: #ff4d4f;
-  color: #fff;
-}
-
-/* 🧾 Form */
-.student-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.student-form label {
-  font-weight: 400;
-  margin-bottom: 0.3rem;
-  color: #444;
-  width: 100%;
-  text-align: left;
-}
-
-.student-form input,
-.student-form select {
-  width: 95%;
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  color: #191919;
-  transition: border 0.3s ease;
-}
-
-.student-form input:focus,
-.student-form select:focus {
-  outline: none;
-  border-color: #191919;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
-}
-
-/* 🔻 Error Text */
-.error-text {
-  color: red;
-  font-size: 0.85rem;
-  margin-top: 4px;
-}
-
-/* ✅ Submit Button */
-.form-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  width: 100%;
-}
-
-.form-footer.center {
-  justify-content: center;
-}
-
-.submit-btn {
-  padding: 0.6rem 1.4rem;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
-  width: 100%;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.submit-btn:hover {
-  background: #db282b;
-}
-
-.submit-btn[disabled] {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* 🪟 Modal */
-.custom-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  padding: 1rem;
-}
-
-.custom-modal-content {
-  background-color: #fff;
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 16px;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.student-name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #333;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  word-break: break-word;
-}
-
-.modal-text {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.custom-modal-close {
-  background: #ff4d4f;
+.add_student_step.add_student_active .add_student_step_number {
+  background-color: #3b82f6;
   color: white;
-  padding: 0.6rem 1.2rem;
+}
+
+.add_student_step_label {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.add_student_step.add_student_active .add_student_step_label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.add_student_step_connector {
+  height: 2px;
+  background-color: #e2e8f0;
+  flex-grow: 1;
+  max-width: 100px;
+  margin: 0 -10px;
+}
+
+/* Form Styles */
+.add_student_form {
+  width: 100%;
+}
+
+.add_student_verify_step {
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.add_student_details_step {
+  width: 100%;
+}
+
+.add_student_form_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.add_student_input_group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add_student_input_group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.add_student_input_group input,
+.add_student_input_group select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+}
+
+.add_student_input_group input:focus,
+.add_student_input_group select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.add_student_input_group input.add_student_error,
+.add_student_input_group select.add_student_error {
+  border-color: #ef4444;
+}
+
+.add_student_error_message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Buttons */
+.add_student_actions_container {
+  position: relative;
+  width: 100%;
+}
+
+.add_student_form_actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.add_student_primary_btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
   border: none;
   border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.add_student_primary_btn:hover {
+  background-color: #3b7de8;
+}
+
+.add_student_secondary_btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #f1f5f9;
+  color: #6c757d;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add_student_secondary_btn:hover {
+  background-color: #e2e8f0;
+}
+
+/* Spinner */
+.add_student_spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.add_student_modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: add_student_fadeIn 0.3s ease-out;
+}
+
+.add_student_modal_content {
+  background-color: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transform: translateY(0);
+  animation: add_student_slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.add_student_modal_header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.add_student_modal_icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.add_student_modal_title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+}
+
+.add_student_modal_body {
+  padding: 1.5rem;
+}
+
+.add_student_modal_text {
+  margin: 0;
+  color: #4a5568;
+  line-height: 1.6;
   font-size: 1rem;
-  transition: background 0.3s ease;
 }
 
-.custom-modal-close:hover {
-  background: #db282b;
+.add_student_modal_footer {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
 }
 
-@keyframes fadeIn {
-  from {
+.add_student_modal_button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background-color: #4f90f8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add_student_modal_button:hover {
+  background-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.add_student_modal_button_icon {
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+}
+
+/* Animations */
+@keyframes add_student_fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes add_student_slideUp {
+  from { 
+    transform: translateY(20px);
     opacity: 0;
-    transform: scale(0.95);
   }
-  to {
+  to { 
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1);
   }
 }
 
-/* 📱 Responsive Design */
-@media screen and (max-width: 768px) {
-  .add-student-container {
-    margin: 1rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .add_student_container {
     padding: 1.5rem;
+    margin: 1rem;
+    padding-bottom: 6rem;
   }
 
-  .stepper {
-    gap: 1rem;
+  .add_student_form_grid {
+    grid-template-columns: 1fr;
   }
 
-  .step .circle {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+  .add_student_stepper {
+    margin-bottom: 1.5rem;
   }
 
-  .step {
-    font-size: 0.85rem;
+  .add_student_step_connector {
+    max-width: 60px;
   }
 
-  .form-footer {
-    justify-content: center;
+  .add_student_actions_container {
+    padding-top: 1rem;
+    margin-top: auto;
+  }
+
+  .add_student_form_actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1rem 0;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .add_student_primary_btn,
+  .add_student_secondary_btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
 }
 
-@media screen and (max-width: 480px) {
-  .add-student-container h2 {
+@media (max-width: 480px) {
+  .add_student_header h2 {
     font-size: 1.5rem;
   }
 
-  .student-form input,
-  .student-form select {
-    border: 1px solid #ccc;
-    color: #191919;
-    font-size: 0.95rem;
-    padding: 0.5rem;
-  }
-  .submit-btn {
-    font-size: 0.95rem;
-    padding: 0.6rem 1.2rem;
+  .add_student_header p {
+    font-size: 0.875rem;
   }
 
-  .custom-modal-content {
-    padding: 1.2rem;
+  .add_student_step_number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.875rem;
   }
 
-  .student-name {
-    font-size: 1.2rem;
+  .add_student_step_label {
+    font-size: 0.75rem;
   }
-
-  .modal-text {
-    font-size: 0.95rem;
+  
+  .add_student_modal_content {
+    margin: 0 1rem;
   }
+  
+  .add_student_modal_header {
+    padding: 1rem;
+  }
+  
+  .add_student_modal_body {
+    padding: 1rem;
+  }
+  
+  .add_student_modal_footer {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
 
-  .custom-modal-close {
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
+@media (max-width: 400px) {
+  .add_student_container {
+    padding-bottom: 7rem;
   }
 }
