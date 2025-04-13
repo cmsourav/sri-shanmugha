@@ -732,6 +732,7 @@ h1, h2, h3, h4 {
   }
 
   .modal__content {
+    margin: 1rem;
     padding: 1rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;

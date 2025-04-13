@@ -38,10 +38,17 @@ const StudentList = () => {
         const snapshot = await getDocs(q);
         const list = snapshot.docs.map((docSnap) => {
           const data = docSnap.data();
+          const createdAt = data.createdAt?.toDate?.();
+          const formattedDate = createdAt
+          ? `${createdAt.getDate().toString().padStart(2, "0")}-${(createdAt.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}-${createdAt.getFullYear()}`
+          : data.createdAt || "N/A";
           const amount = Number(data.amountPaid) || 0;
           return {
             id: docSnap.id,
             ...data,
+            createdAt: formattedDate,
             amountPaid: new Intl.NumberFormat("en-IN", {
               style: "currency",
               currency: "INR",
