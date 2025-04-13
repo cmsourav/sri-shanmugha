@@ -391,9 +391,6 @@ body {
   padding: 0 8px
 }
 
-.mobile-nav-item:hover:last-child {
-  color: #ef4444;
-}
 
 .mobile-nav-item:active:last-child {
   transform: scale(0.95);
