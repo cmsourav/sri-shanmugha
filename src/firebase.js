@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyARJPYpCT4BVPP6GbCsjgenO6e5Fn-ox2g",
-  authDomain: "km-web-5fea0.firebaseapp.com",
-  projectId: "km-web-5fea0",
-  storageBucket: "km-web-5fea0.firebasestorage.app",
-  messagingSenderId: "189422355169",
-  appId: "1:189422355169:web:d33edd6cc0a02d31d5ada0",
-  measurementId: "G-QBTHYVT4G2"
+  apiKey: import.meta.env.VITE_FB_APIKEY,
+  authDomain: import.meta.env.VITE_FB_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_FB_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FB_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FB_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FB_APP_ID,
+  measurementId: import.meta.env.VITE_FB_MEASUREMENT_ID
 };
 
 
