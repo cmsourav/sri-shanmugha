@@ -233,7 +233,7 @@ const LoginPage = () => {
                   setResetStatus({ state: 'idle', message: '' });
                 }}
               >
-                Forgot password?
+                Forgot password ??
               </button>
               <div className="signup-prompt">
                 Don't have an account?{' '}
