@@ -108,39 +108,6 @@ const StudentList = () => {
     setShowEditModal(true);
   };
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setSelectedStudent((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const updateStudent = async () => {
-    setIsSaving(true);
-    try {
-      const studentRef = doc(db, "shanmugha", selectedStudent.id);
-      const updateData = {
-        ...selectedStudent,
-        amountPaid: selectedStudent.rawAmount || 0
-      };
-      delete updateData.id;
-      delete updateData.rawAmount;
-      await updateDoc(studentRef, updateData);
-      setStudents((prev) =>
-        prev.map((s) => (s.id === selectedStudent.id ? {
-          ...selectedStudent,
-          amountPaid: new Intl.NumberFormat("en-IN", {
-            style: "currency",
-            currency: "INR",
-          }).format(selectedStudent.rawAmount || 0)
-        } : s))
-      );
-      setShowEditModal(false);
-    } catch (err) {
-      alert("Failed to update student.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   // Student Card Component
   const StudentCard = ({ student }) => (
     <div className="student-card">
@@ -190,237 +157,279 @@ const StudentList = () => {
   );
 
   // Edit Modal Content
-  const EditModal = () => (
-    <div className="modal modal--edit">
-      <div className="modal__overlay" onClick={() => setShowEditModal(false)}></div>
-      <div className="modal__container">
-        <div className="modal__header">
-          <div className="modal__header-content">
-            <h2 className="modal__title">Edit Student Details</h2>
-            <p className="modal__subtitle">ID: {selectedStudent.id}</p>
+  const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
+    if (!selectedStudent) return null; 
+
+    const [localStudent, setLocalStudent] = useState(selectedStudent);
+
+    useEffect(() => {
+      if (selectedStudent) {
+        setLocalStudent(selectedStudent);
+      }
+    }, [selectedStudent]);
+
+    const handleEditChange = (e) => {
+      const { name, value } = e.target;
+      setLocalStudent(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    };
+
+    const handleAmountChange = (e) => {
+      const value = parseFloat(e.target.value) || 0;
+      setLocalStudent(prev => ({
+        ...prev,
+        rawAmount: value,
+        amountPaid: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(value)
+      }));
+    };
+
+    const updateStudentData = async () => {
+      setIsSaving(true);
+      try {
+        const studentRef = doc(db, "shanmugha", localStudent.id);
+        const updateData = {
+          ...localStudent,
+          amountPaid: localStudent.rawAmount || 0
+        };
+        await updateDoc(studentRef, updateData);
+        setStudents((prev) =>
+          prev.map((s) =>
+            s.id === localStudent.id ? localStudent : s
+          )
+        );
+        setShowEditModal(false);
+      } catch(err) {
+        console.log(err)
+        alert("Failed to update student.");
+      } finally {
+        setIsSaving(false);
+      }
+    }
+
+    return (
+      <div className="modal modal--edit">
+        <div className="modal__overlay" onClick={() => setShowEditModal(false)}></div>
+        <div className="modal__container">
+          <div className="modal__header">
+            <div className="modal__header-content">
+              <h2 className="modal__title">Edit Student Details</h2>
+              <p className="modal__subtitle">ID: {localStudent.id}</p>
+            </div>
+            <button
+              className="modal__close-button"
+              onClick={() => setShowEditModal(false)}
+              aria-label="Close modal"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
           </div>
-          <button
-            className="modal__close-button"
-            onClick={() => setShowEditModal(false)}
-            aria-label="Close modal"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
 
-        <div className="modal__content">
-          <div className="form-section">
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="form-group__label">Application Status</label>
-                <select
-                  className="form-outlined-input"
-                  name="applicationStatus"
-                  value={selectedStudent.applicationStatus}
-                  onChange={handleEditChange}
-                  required
-                >
-                  <option value="Enquiry">Enquiry</option>
-                  <option value="Enroll">Enroll</option>
-                </select>
+          <div className="modal__content">
+            <div className="form-section">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-group__label">Application Status</label>
+                  <select
+                    className="form-outlined-input"
+                    name="applicationStatus"
+                    value={localStudent.applicationStatus}
+                    onChange={handleEditChange}
+                    required
+                  >
+                    <option value="Enquiry">Enquiry</option>
+                    <option value="Enroll">Enroll</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Full Name</label>
+                  <input
+                    className="form-outlined-input"
+                    name="candidateName"
+                    value={localStudent.candidateName}
+                    onChange={handleEditChange}
+                    required
+                    placeholder="Enter full name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Phone Number</label>
+                  <input
+                    className="form-outlined-input"
+                    name="candidateNumber"
+                    value={localStudent.candidateNumber}
+                    onChange={handleEditChange}
+                    type="tel"
+                    pattern="[0-9]{10}"
+                    placeholder="Enter 10-digit phone number"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Father's Name</label>
+                  <input
+                    className="form-outlined-input"
+                    name="fatherName"
+                    value={localStudent.fatherName || ""}
+                    onChange={handleEditChange}
+                    placeholder="Enter father's name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="form-outlined-input"
+                    name="dob"
+                    value={localStudent.dob}
+                    onChange={handleEditChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Course</label>
+                  <input
+                    className="form-outlined-input"
+                    name="course"
+                    value={localStudent.course}
+                    onChange={handleEditChange}
+                    required
+                    placeholder="Enter course name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">College</label>
+                  <input
+                    className="form-outlined-input"
+                    name="college"
+                    value={localStudent.college}
+                    onChange={handleEditChange}
+                    required
+                    placeholder="Enter college name"
+                  />
+                </div>
+
+                {localStudent.applicationStatus === "Enroll" && (
+                  <>
+                    <div className="form-group">
+                      <label className="form-group__label">Gender</label>
+                      <select
+                        className="form-outlined-input"
+                        name="gender"
+                        value={localStudent.gender || ""}
+                        onChange={handleEditChange}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Parent's Phone</label>
+                      <input
+                        className="form-outlined-input"
+                        name="parentNumber"
+                        value={localStudent.parentNumber || ""}
+                        onChange={handleEditChange}
+                        type="tel"
+                        pattern="[0-9]{10}"
+                        placeholder="Enter parent's phone number"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Place</label>
+                      <input
+                        className="form-outlined-input"
+                        name="place"
+                        value={localStudent.place || ""}
+                        onChange={handleEditChange}
+                        placeholder="Enter city/town"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Aadhaar Number</label>
+                      <input
+                        className="form-outlined-input"
+                        name="adhaarNumber"
+                        value={localStudent.adhaarNumber || ""}
+                        onChange={handleEditChange}
+                        type="text"
+                        pattern="[0-9]{12}"
+                        title="12-digit Aadhaar number"
+                        placeholder="Enter 12-digit Aadhaar number"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Amount Paid (₹)</label>
+                      <input
+                        className="form-outlined-input"
+                        name="amountPaid"
+                        value={localStudent.rawAmount || ""}
+                        onChange={handleAmountChange}
+                        placeholder="Enter amount"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Transaction ID</label>
+                      <input
+                        className="form-outlined-input"
+                        name="transactionId"
+                        value={localStudent.transactionId || ""}
+                        onChange={handleEditChange}
+                        placeholder="Enter transaction ID"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Full Name</label>
-                <input
-                  className="form-outlined-input"
-                  name="candidateName"
-                  value={selectedStudent.candidateName}
-                  onChange={handleEditChange}
-                  required
-                  placeholder="Enter full name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Phone Number</label>
-                <input
-                  className="form-outlined-input"
-                  name="candidateNumber"
-                  value={selectedStudent.candidateNumber}
-                  onChange={handleEditChange}
-                  type="tel"
-                  pattern="[0-9]{10}"
-                  placeholder="Enter 10-digit phone number"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Father's Name</label>
-                <input
-                  className="form-outlined-input"
-                  name="fatherName"
-                  value={selectedStudent.fatherName || ""}
-                  onChange={handleEditChange}
-                  placeholder="Enter father's name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Date of Birth</label>
-                <input
-                  type="date"
-                  className="form-outlined-input"
-                  name="dob"
-                  value={selectedStudent.dob}
-                  onChange={handleEditChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Course</label>
-                <input
-                  className="form-outlined-input"
-                  name="course"
-                  value={selectedStudent.course}
-                  onChange={handleEditChange}
-                  required
-                  placeholder="Enter course name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">College</label>
-                <input
-                  className="form-outlined-input"
-                  name="college"
-                  value={selectedStudent.college}
-                  onChange={handleEditChange}
-                  required
-                  placeholder="Enter college name"
-                />
-              </div>
-
-              {selectedStudent.applicationStatus === "Enroll" && (
-                <>
-                  <div className="form-group">
-                    <label className="form-group__label">Gender</label>
-                    <select
-                      className="form-outlined-input"
-                      name="gender"
-                      value={selectedStudent.gender || ""}
-                      onChange={handleEditChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Parent's Phone</label>
-                    <input
-                      className="form-outlined-input"
-                      name="parentNumber"
-                      value={selectedStudent.parentNumber || ""}
-                      onChange={handleEditChange}
-                      type="tel"
-                      pattern="[0-9]{10}"
-                      placeholder="Enter parent's phone number"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Place</label>
-                    <input
-                      className="form-outlined-input"
-                      name="place"
-                      value={selectedStudent.place || ""}
-                      onChange={handleEditChange}
-                      placeholder="Enter city/town"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Aadhaar Number</label>
-                    <input
-                      className="form-outlined-input"
-                      name="adhaarNumber"
-                      value={selectedStudent.adhaarNumber || ""}
-                      onChange={handleEditChange}
-                      type="text"
-                      pattern="[0-9]{12}"
-                      title="12-digit Aadhaar number"
-                      placeholder="Enter 12-digit Aadhaar number"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Amount Paid (₹)</label>
-                    <input
-                      type="number"
-                      className="form-outlined-input"
-                      name="amountPaid"
-                      value={selectedStudent.rawAmount || ""}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0;
-                        setSelectedStudent(prev => ({
-                          ...prev,
-                          rawAmount: value,
-                          amountPaid: new Intl.NumberFormat("en-IN", {
-                            style: "currency",
-                            currency: "INR",
-                          }).format(value)
-                        }));
-                      }}
-                      min="0"
-                      step="100"
-                      placeholder="Enter amount"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Transaction ID</label>
-                    <input
-                      className="form-outlined-input"
-                      name="transactionId"
-                      value={selectedStudent.transactionId || ""}
-                      onChange={handleEditChange}
-                      placeholder="Enter transaction ID"
-                    />
-                  </div>
-                </>
-              )}
             </div>
           </div>
-        </div>
 
-        <div className="modal__footer">
-          <button
-            className="button button--outline"
-            onClick={() => setShowEditModal(false)}
-            disabled={isSaving}
-          >
-            Cancel
-          </button>
-          <button
-            className="button button--primary"
-            onClick={updateStudent}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <svg className="button__spinner" viewBox="0 0 50 50">
-                  <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" strokeWidth="5"></circle>
-                </svg>
-                Saving...
-              </>
-            ) : "Save Changes"}
-          </button>
+          <div className="modal__footer">
+            <button
+              className="button button--outline"
+              onClick={() => setShowEditModal(false)}
+              disabled={isSaving}
+            >
+              Cancel
+            </button>
+            <button
+              className="button button--primary"
+              onClick={() => updateStudentData(localStudent)}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <svg className="button__spinner" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" strokeWidth="5"></circle>
+                  </svg>
+                  Saving...
+                </>
+              ) : "Save Changes"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Details Modal Content
   const DetailsModal = () => (
@@ -690,7 +699,12 @@ const StudentList = () => {
         )}
       </main>
 
-      {showEditModal && <EditModal />}
+      {showEditModal && 
+      <EditModal 
+      selectedStudent={selectedStudent}
+      setShowEditModal={setShowEditModal}
+      isSaving={isSaving}
+      />}
       {showDetailsModal && <DetailsModal />}
     </div>
   );
