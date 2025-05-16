@@ -151,7 +151,7 @@ const AddStudent = () => {
     const id = student.studentId.trim();
 
     if (!id || !/^\d+$/.test(id)) {
-      setFormErrors({ studentId: "Please enter a valid numeric Student ID." });
+      setFormErrors({ studentId: "Please enter a valid numeric register number." });
       return;
     }
 
@@ -248,14 +248,14 @@ const AddStudent = () => {
         {currentStep === 1 && (
           <div className="add_student_verify_step">
             <div className="add_student_input_group">
-              <label htmlFor="studentId">Student ID</label>
+              <label htmlFor="studentId">Register Number</label>
               <input
                 type="text"
                 id="studentId"
                 name="studentId"
                 value={student.studentId}
                 onChange={handleChange}
-                placeholder="Enter student ID"
+                placeholder="Enter register number"
                 className={formErrors.studentId ? "add_student_error" : ""}
               />
               {formErrors.studentId && <span className="add_student_error_message">{formErrors.studentId}</span>}
