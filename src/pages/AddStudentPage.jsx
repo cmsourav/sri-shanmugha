@@ -50,14 +50,14 @@ const Stepper = ({ currentStep }) => (
 
 const Modal = ({ isOpen, onClose, message }) => {
   if (!isOpen) return null;
-  
+
   return (
     <div className="add_student_modal_overlay">
       <div className="add_student_modal_content">
         <div className="add_student_modal_header">
           <svg className="add_student_modal_icon" viewBox="0 0 24 24">
-            <path 
-              fill="currentColor" 
+            <path
+              fill="currentColor"
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-12h2v10h-2V5z"
             />
           </svg>
@@ -67,8 +67,8 @@ const Modal = ({ isOpen, onClose, message }) => {
           <p className="add_student_modal_text">{message.text}</p>
         </div>
         <div className="add_student_modal_footer">
-          <button 
-            className="add_student_modal_button" 
+          <button
+            className="add_student_modal_button"
             onClick={onClose}
           >
             Close
@@ -84,6 +84,13 @@ const Modal = ({ isOpen, onClose, message }) => {
     </div>
   );
 };
+
+// Small component for info icon
+const InfoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
 
 const AddStudent = () => {
   const [student, setStudent] = useState({
@@ -125,7 +132,7 @@ const AddStudent = () => {
     fetchColleges();
   }, []);
 
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -253,8 +260,22 @@ const AddStudent = () => {
               />
               {formErrors.studentId && <span className="add_student_error_message">{formErrors.studentId}</span>}
             </div>
-            <button 
-              type="button" 
+
+            {/* Help Card */}
+            <div className="help-card">
+              <div className="help-header">
+                <InfoIcon />
+                <span>Which number should I enter?</span>
+              </div>
+              <ul className="help-list">
+                <li>For <strong>State Board</strong> students: Enter the Register Number from SSLC marks card</li>
+                <li>For <strong>CBSE</strong> students: Enter the Roll Number from CBSE certificate</li>
+                <li>For <strong>Other Boards</strong>: Enter the official registration number</li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
               className="add_student_primary_btn"
               onClick={handleVerify}
             >
@@ -375,15 +396,15 @@ const AddStudent = () => {
 
             <div className="add_student_actions_container">
               <div className="add_student_form_actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="add_student_secondary_btn"
                   onClick={() => setCurrentStep(1)}
                 >
                   Back
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="add_student_primary_btn"
                   disabled={submissionStatus === "loading"}
                 >
@@ -399,10 +420,10 @@ const AddStudent = () => {
         )}
       </form>
 
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        message={modalMessage} 
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message={modalMessage}
       />
     </div>
   );
