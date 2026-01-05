@@ -26,13 +26,12 @@ const StudentList = () => {
   const studentsPerPage = 8;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Fetch students
   useEffect(() => {
     const fetchStudents = async (user) => {
       try {
         setIsLoading(true);
         const q = query(
-          collection(db, "shanmugha"),
+          collection(db, "shanmugha-26"),
           where("createdBy", "==", user.uid)
         );
         const snapshot = await getDocs(q);
@@ -232,7 +231,7 @@ const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
   const updateStudentData = async () => {
     setIsSaving(true);
     try {
-      const studentRef = doc(db, "shanmugha", localStudent.id);
+      const studentRef = doc(db, "shanmugha-26", localStudent.id);
       const updateData = {
         ...localStudent,
         amountPaid: localStudent.rawAmount || 0

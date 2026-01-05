@@ -155,7 +155,7 @@ const AddStudent = () => {
       return;
     }
 
-    const docSnap = await getDoc(doc(db, "shanmugha", id));
+    const docSnap = await getDoc(doc(db, "shanmugha-26", id));
     if (docSnap.exists()) {
       const data = docSnap.data();
       setModalMessage({ name: data.candidateName, text: "Student ID already exists." });
@@ -207,7 +207,7 @@ const AddStudent = () => {
     studentData.createdBy = user.uid
 
     try {
-      await setDoc(doc(db, "shanmugha", student.studentId), studentData);
+      await setDoc(doc(db, "shanmugha-26", student.studentId), studentData);
       setSubmissionStatus("idle");
       setModalMessage({ name: student.candidateName, text: "Student successfully registered!" });
       setIsModalOpen(true);
