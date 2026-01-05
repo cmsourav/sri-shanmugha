@@ -39,10 +39,10 @@ const StudentList = () => {
           const data = docSnap.data();
           const createdAt = data.createdAt?.toDate?.();
           const formattedDate = createdAt
-          ? `${createdAt.getDate().toString().padStart(2, "0")}-${(createdAt.getMonth() + 1)
+            ? `${createdAt.getDate().toString().padStart(2, "0")}-${(createdAt.getMonth() + 1)
               .toString()
               .padStart(2, "0")}-${createdAt.getFullYear()}`
-          : data.createdAt || "N/A";
+            : data.createdAt || "N/A";
           const amount = Number(data.amountPaid) || 0;
           return {
             id: docSnap.id,
@@ -156,537 +156,565 @@ const StudentList = () => {
   );
 
   // Edit Modal Content
-// Edit Modal Content
-const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
-  const [localStudent, setLocalStudent] = useState(selectedStudent);
-  const [collegeOptions, setCollegeOptions] = useState([]);
-  const [courseOptions, setCourseOptions] = useState([]);
+  // Edit Modal Content
+  const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
+    const [localStudent, setLocalStudent] = useState(selectedStudent);
+    const [collegeOptions, setCollegeOptions] = useState([]);
+    const [courseOptions, setCourseOptions] = useState([]);
 
-  // Fetch colleges and their courses from Firestore
-  useEffect(() => {
-    const fetchColleges = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "colleges"));
-        const options = snapshot.docs.map(doc => ({
-          id: doc.id,
-          name: doc.data().name,
-          courses: doc.data().courses || [],
-        }));
-        setCollegeOptions(options);
-        
-        // If the student's college exists in options, set its courses
-        if (selectedStudent.college) {
-          const selectedCollege = options.find(c => c.name === selectedStudent.college);
-          if (selectedCollege) {
-            setCourseOptions(selectedCollege.courses);
+    // Fetch colleges and their courses from Firestore
+    useEffect(() => {
+      const fetchColleges = async () => {
+        try {
+          const snapshot = await getDocs(collection(db, "colleges"));
+          const options = snapshot.docs.map(doc => ({
+            id: doc.id,
+            name: doc.data().name,
+            courses: doc.data().courses || [],
+          }));
+          setCollegeOptions(options);
+
+          // If the student's college exists in options, set its courses
+          if (selectedStudent.college) {
+            const selectedCollege = options.find(c => c.name === selectedStudent.college);
+            if (selectedCollege) {
+              setCourseOptions(selectedCollege.courses);
+            }
           }
+        } catch (err) {
+          console.error("Failed to load colleges:", err);
         }
-      } catch (err) {
-        console.error("Failed to load colleges:", err);
+      };
+
+      fetchColleges();
+    }, [selectedStudent.college]);
+
+    useEffect(() => {
+      if (selectedStudent) {
+        setLocalStudent(selectedStudent);
+      }
+    }, [selectedStudent]);
+
+    if (!selectedStudent) return null;
+
+    const handleEditChange = (e) => {
+      const { name, value } = e.target;
+
+      if (name === "college") {
+        const selected = collegeOptions.find((c) => c.name === value);
+        setCourseOptions(selected?.courses || []);
+        setLocalStudent(prev => ({
+          ...prev,
+          course: "", // Reset course when college changes
+          [name]: value
+        }));
+      } else {
+        setLocalStudent(prev => ({
+          ...prev,
+          [name]: value
+        }));
       }
     };
 
-    fetchColleges();
-  }, [selectedStudent.college]);
-
-  useEffect(() => {
-    if (selectedStudent) {
-      setLocalStudent(selectedStudent);
-    }
-  }, [selectedStudent]);
-
-  if (!selectedStudent) return null;
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "college") {
-      const selected = collegeOptions.find((c) => c.name === value);
-      setCourseOptions(selected?.courses || []);
+    const handleAmountChange = (e) => {
+      const value = parseFloat(e.target.value) || 0;
       setLocalStudent(prev => ({
         ...prev,
-        course: "", // Reset course when college changes
-        [name]: value
+        rawAmount: value,
+        amountPaid: new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }).format(value)
       }));
-    } else {
-      setLocalStudent(prev => ({
-        ...prev,
-        [name]: value
-      }));
+    };
+
+    const updateStudentData = async () => {
+      setIsSaving(true);
+      try {
+        const studentRef = doc(db, "shanmugha-26", localStudent.id);
+        const updateData = {
+          ...localStudent,
+          amountPaid: localStudent.rawAmount || 0
+        };
+        await updateDoc(studentRef, updateData);
+        setStudents((prev) =>
+          prev.map((s) =>
+            s.id === localStudent.id ? localStudent : s
+          )
+        );
+        setShowEditModal(false);
+      } catch (err) {
+        console.log(err)
+        alert("Failed to update student.");
+      } finally {
+        setIsSaving(false);
+      }
     }
-  };
 
-  const handleAmountChange = (e) => {
-    const value = parseFloat(e.target.value) || 0;
-    setLocalStudent(prev => ({
-      ...prev,
-      rawAmount: value,
-      amountPaid: new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-      }).format(value)
-    }));
-  };
-
-  const updateStudentData = async () => {
-    setIsSaving(true);
-    try {
-      const studentRef = doc(db, "shanmugha-26", localStudent.id);
-      const updateData = {
-        ...localStudent,
-        amountPaid: localStudent.rawAmount || 0
-      };
-      await updateDoc(studentRef, updateData);
-      setStudents((prev) =>
-        prev.map((s) =>
-          s.id === localStudent.id ? localStudent : s
-        )
-      );
-      setShowEditModal(false);
-    } catch(err) {
-      console.log(err)
-      alert("Failed to update student.");
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  return (
-    <div className="modal modal--edit">
-      <div className="modal__overlay" onClick={() => setShowEditModal(false)}></div>
-      <div className="modal__container">
-        <div className="modal__header">
-          <div className="modal__header-content">
-            <h2 className="modal__title">Edit Student Details</h2>
-            <p className="modal__subtitle">ID: {localStudent.id}</p>
+    return (
+      <div className="modal modal--edit">
+        <div className="modal__overlay" onClick={() => setShowEditModal(false)}></div>
+        <div className="modal__container">
+          <div className="modal__header">
+            <div className="modal__header-content">
+              <h2 className="modal__title">Edit Student Details</h2>
+              <p className="modal__subtitle">ID: {localStudent.id}</p>
+            </div>
+            <button
+              className="modal__close-button"
+              onClick={() => setShowEditModal(false)}
+              aria-label="Close modal"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
           </div>
-          <button
-            className="modal__close-button"
-            onClick={() => setShowEditModal(false)}
-            aria-label="Close modal"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
 
-        <div className="modal__content">
-          <div className="form-section">
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="form-group__label">Application Status</label>
-                <select
-                  className="form-outlined-input"
-                  name="applicationStatus"
-                  value={localStudent.applicationStatus}
-                  onChange={handleEditChange}
-                  required
-                >
-                  <option value="Enquiry">Enquiry</option>
-                  <option value="Enroll">Enroll</option>
-                </select>
+          <div className="modal__content">
+            <div className="form-section">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-group__label">Application Status</label>
+                  <select
+                    className="form-outlined-input"
+                    name="applicationStatus"
+                    value={localStudent.applicationStatus}
+                    onChange={handleEditChange}
+                    required
+                  >
+                    <option value="Enquiry">Enquiry</option>
+                    <option value="Enroll">Enroll</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Full Name</label>
+                  <input
+                    className="form-outlined-input"
+                    name="candidateName"
+                    value={localStudent.candidateName}
+                    onChange={handleEditChange}
+                    required
+                    placeholder="Enter full name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Phone Number</label>
+                  <input
+                    className="form-outlined-input"
+                    name="candidateNumber"
+                    value={localStudent.candidateNumber}
+                    onChange={handleEditChange}
+                    type="tel"
+                    pattern="[0-9]{10}"
+                    placeholder="Enter 10-digit phone number"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Father's Name</label>
+                  <input
+                    className="form-outlined-input"
+                    name="fatherName"
+                    value={localStudent.fatherName || ""}
+                    onChange={handleEditChange}
+                    placeholder="Enter father's name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-group__label">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="form-outlined-input"
+                    name="dob"
+                    value={localStudent.dob}
+                    onChange={handleEditChange}
+                  />
+                </div>
+
+                {/* College Dropdown */}
+                <div className="form-group">
+                  <label className="form-group__label">College</label>
+                  <select
+                    className="form-outlined-input"
+                    name="college"
+                    value={localStudent.college}
+                    onChange={handleEditChange}
+                    required
+                  >
+                    <option value="">Select College</option>
+                    {collegeOptions.map((college) => (
+                      <option key={college.id} value={college.name}>
+                        {college.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Course Dropdown */}
+                <div className="form-group">
+                  <label className="form-group__label">Course</label>
+                  <select
+                    className="form-outlined-input"
+                    name="course"
+                    value={localStudent.course}
+                    onChange={handleEditChange}
+                    required
+                    disabled={!localStudent.college}
+                  >
+                    <option value="">Select Course</option>
+                    {courseOptions.map((course, index) => (
+                      <option key={index} value={course}>
+                        {course}
+                      </option>
+                    ))}
+                    {!courseOptions.includes(localStudent.course) && localStudent.course && (
+                      <option value={localStudent.course}>
+                        {localStudent.course} (Current)
+                      </option>
+                    )}
+                  </select>
+                </div>
+
+                {localStudent.applicationStatus === "Enroll" && (
+                  <>
+                    <div className="form-group">
+                      <label className="form-group__label">Gender</label>
+                      <select
+                        className="form-outlined-input"
+                        name="gender"
+                        value={localStudent.gender || ""}
+                        onChange={handleEditChange}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Parent's Phone</label>
+                      <input
+                        className="form-outlined-input"
+                        name="parentNumber"
+                        value={localStudent.parentNumber || ""}
+                        onChange={handleEditChange}
+                        type="tel"
+                        pattern="[0-9]{10}"
+                        placeholder="Enter parent's phone number"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Place</label>
+                      <input
+                        className="form-outlined-input"
+                        name="place"
+                        value={localStudent.place || ""}
+                        onChange={handleEditChange}
+                        placeholder="Enter city/town"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Aadhaar Number</label>
+                      <input
+                        className="form-outlined-input"
+                        name="adhaarNumber"
+                        value={localStudent.adhaarNumber || ""}
+                        onChange={handleEditChange}
+                        type="text"
+                        pattern="[0-9]{12}"
+                        title="12-digit Aadhaar number"
+                        placeholder="Enter 12-digit Aadhaar number"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Amount Paid (₹)</label>
+                      <input
+                        className="form-outlined-input"
+                        name="amountPaid"
+                        value={localStudent.rawAmount || ""}
+                        onChange={handleAmountChange}
+                        placeholder="Enter amount"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-group__label">Transaction ID</label>
+                      <input
+                        className="form-outlined-input"
+                        name="transactionId"
+                        value={localStudent.transactionId || ""}
+                        onChange={handleEditChange}
+                        placeholder="Enter transaction ID"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Full Name</label>
-                <input
-                  className="form-outlined-input"
-                  name="candidateName"
-                  value={localStudent.candidateName}
-                  onChange={handleEditChange}
-                  required
-                  placeholder="Enter full name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Phone Number</label>
-                <input
-                  className="form-outlined-input"
-                  name="candidateNumber"
-                  value={localStudent.candidateNumber}
-                  onChange={handleEditChange}
-                  type="tel"
-                  pattern="[0-9]{10}"
-                  placeholder="Enter 10-digit phone number"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Father's Name</label>
-                <input
-                  className="form-outlined-input"
-                  name="fatherName"
-                  value={localStudent.fatherName || ""}
-                  onChange={handleEditChange}
-                  placeholder="Enter father's name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-group__label">Date of Birth</label>
-                <input
-                  type="date"
-                  className="form-outlined-input"
-                  name="dob"
-                  value={localStudent.dob}
-                  onChange={handleEditChange}
-                />
-              </div>
-
-              {/* College Dropdown */}
-              <div className="form-group">
-                <label className="form-group__label">College</label>
-                <select
-                  className="form-outlined-input"
-                  name="college"
-                  value={localStudent.college}
-                  onChange={handleEditChange}
-                  required
-                >
-                  <option value="">Select College</option>
-                  {collegeOptions.map((college) => (
-                    <option key={college.id} value={college.name}>
-                      {college.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Course Dropdown */}
-              <div className="form-group">
-                <label className="form-group__label">Course</label>
-                <select
-                  className="form-outlined-input"
-                  name="course"
-                  value={localStudent.course}
-                  onChange={handleEditChange}
-                  required
-                  disabled={!localStudent.college}
-                >
-                  <option value="">Select Course</option>
-                  {courseOptions.map((course, index) => (
-                    <option key={index} value={course}>
-                      {course}
-                    </option>
-                  ))}
-                  {!courseOptions.includes(localStudent.course) && localStudent.course && (
-                    <option value={localStudent.course}>
-                      {localStudent.course} (Current)
-                    </option>
-                  )}
-                </select>
-              </div>
-
-              {localStudent.applicationStatus === "Enroll" && (
-                <>
-                  <div className="form-group">
-                    <label className="form-group__label">Gender</label>
-                    <select
-                      className="form-outlined-input"
-                      name="gender"
-                      value={localStudent.gender || ""}
-                      onChange={handleEditChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Parent's Phone</label>
-                    <input
-                      className="form-outlined-input"
-                      name="parentNumber"
-                      value={localStudent.parentNumber || ""}
-                      onChange={handleEditChange}
-                      type="tel"
-                      pattern="[0-9]{10}"
-                      placeholder="Enter parent's phone number"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Place</label>
-                    <input
-                      className="form-outlined-input"
-                      name="place"
-                      value={localStudent.place || ""}
-                      onChange={handleEditChange}
-                      placeholder="Enter city/town"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Aadhaar Number</label>
-                    <input
-                      className="form-outlined-input"
-                      name="adhaarNumber"
-                      value={localStudent.adhaarNumber || ""}
-                      onChange={handleEditChange}
-                      type="text"
-                      pattern="[0-9]{12}"
-                      title="12-digit Aadhaar number"
-                      placeholder="Enter 12-digit Aadhaar number"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Amount Paid (₹)</label>
-                    <input
-                      className="form-outlined-input"
-                      name="amountPaid"
-                      value={localStudent.rawAmount || ""}
-                      onChange={handleAmountChange}
-                      placeholder="Enter amount"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-group__label">Transaction ID</label>
-                    <input
-                      className="form-outlined-input"
-                      name="transactionId"
-                      value={localStudent.transactionId || ""}
-                      onChange={handleEditChange}
-                      placeholder="Enter transaction ID"
-                    />
-                  </div>
-                </>
-              )}
             </div>
           </div>
-        </div>
 
-        <div className="modal__footer">
-          <button
-            className="button button--outline"
-            onClick={() => setShowEditModal(false)}
-            disabled={isSaving}
-          >
-            Cancel
-          </button>
-          <button
-            className="button button--primary"
-            onClick={updateStudentData}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <svg className="button__spinner" viewBox="0 0 50 50">
-                  <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" strokeWidth="5"></circle>
-                </svg>
-                Saving...
-              </>
-            ) : "Save Changes"}
-          </button>
+          <div className="modal__footer">
+            <button
+              className="button button--outline"
+              onClick={() => setShowEditModal(false)}
+              disabled={isSaving}
+            >
+              Cancel
+            </button>
+            <button
+              className="button button--primary"
+              onClick={updateStudentData}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <svg className="button__spinner" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" strokeWidth="5"></circle>
+                  </svg>
+                  Saving...
+                </>
+              ) : "Save Changes"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   // PDF Generation Function
   const generateStudentPDF = (student) => {
     const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    
-    // Detect mobile device
-    const isMobile = window.innerWidth <= 768;
-    
-    // Adjust dimensions for mobile
-    const margin = isMobile ? 10 : 15;
-    const headerHeight = isMobile ? 30 : 35;
+    const pageWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const margin = 15;
     const contentWidth = pageWidth - (margin * 2);
-    
+
+    // Config
+    const headerHeight = 40;
+    const footerHeight = 20;
     let yPosition = margin;
 
     // Colors
-    const primaryColor = [41, 128, 185]; // Blue
-    const secondaryColor = [52, 73, 94]; // Dark gray
-    const accentColor = [155, 89, 182]; // Purple
-    const lightGray = [236, 240, 241];
-
-    // Font sizes adjusted for mobile
-    const titleFontSize = isMobile ? 16 : 18;
-    const subtitleFontSize = isMobile ? 10 : 12;
-    const sectionFontSize = isMobile ? 11 : 14;
-    const contentFontSize = isMobile ? 9 : 10;
-    const footerFontSize = isMobile ? 7 : 8;
-
-    // Helper functions
-    const addHeader = () => {
-      // Header background
-      doc.setFillColor(...lightGray);
-      doc.rect(0, 0, pageWidth, headerHeight, 'F');
-
-      // Company title - responsive sizing
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(titleFontSize);
-      doc.setTextColor(...primaryColor);
-      doc.text("Sri Shanmugha Educational Services", pageWidth / 2, 12, { align: "center" });
-
-      // Subtitle
-      doc.setFontSize(subtitleFontSize);
-      doc.setTextColor(...secondaryColor);
-      doc.text("Student Information Report", pageWidth / 2, isMobile ? 22 : 25, { align: "center" });
-
-      // Header border
-      doc.setDrawColor(...primaryColor);
-      doc.setLineWidth(0.5);
-      doc.line(0, headerHeight, pageWidth, headerHeight);
+    const colors = {
+      primary: [41, 128, 185],    // Blue
+      secondary: [52, 73, 94],    // Dark Gray
+      accent: [236, 240, 241],    // Light Gray Background
+      text: [44, 62, 80],         // Body Text
+      white: [255, 255, 255]
     };
 
-    const addSection = (title, data, startY) => {
-      let currentY = startY;
+    // Helper: Add decorative header
+    const addHeader = () => {
+      // Header Background
+      doc.setFillColor(...colors.accent);
+      doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-      // Section title with background
-      doc.setFillColor(...primaryColor);
-      doc.rect(margin, currentY - 2, contentWidth, isMobile ? 8 : 10, 'F');
+      // Accent Line
+      doc.setDrawColor(...colors.primary);
+      doc.setLineWidth(1.5);
+      doc.line(0, headerHeight, pageWidth, headerHeight);
+
+      // Logo/Title Area
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(...colors.primary);
+      doc.text("Sri Shanmugha", margin, 20);
+
+      doc.setFontSize(12);
+      doc.setTextColor(...colors.secondary);
+      doc.setFont("helvetica", "normal");
+      doc.text("Educational Services", margin, 28);
+
+      // Report Title (Right Aligned)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(...colors.text);
+      doc.text("STUDENT PROFILE", pageWidth - margin, 20, { align: "right" });
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(127, 140, 141);
+      doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, pageWidth - margin, 28, { align: "right" });
+    };
+
+    // Helper: Add Footer with Page Number
+    const addFooter = (pageNumber) => {
+      const footerY = pageHeight - 10;
+
+      // Line
+      doc.setDrawColor(...colors.primary);
+      doc.setLineWidth(0.5);
+      doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+      // Text
+      doc.setFontSize(8);
+      doc.setTextColor(...colors.secondary);
+      doc.text("Sri Shanmugha Educational Services - Confidential Report", margin, footerY);
+      doc.text(`Page ${pageNumber}`, pageWidth - margin, footerY, { align: "right" });
+    };
+
+    // Helper: Check Page Break
+    const checkPageBreak = (heightNeeded) => {
+      if (yPosition + heightNeeded > pageHeight - footerHeight) {
+        addFooter(doc.internal.getNumberOfPages());
+        doc.addPage();
+        addHeader();
+        yPosition = headerHeight + 10;
+        return true;
+      }
+      return false;
+    };
+
+    // Helper: Render Section Title
+    const addSectionTitle = (title) => {
+      checkPageBreak(15);
+
+      doc.setFillColor(...colors.primary);
+      doc.rect(margin, yPosition, 5, 8, 'F'); // Decorative accent mark
 
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(sectionFontSize - 1);
-      doc.setTextColor(255, 255, 255);
-      doc.text(title, margin + 3, currentY + (isMobile ? 3 : 4));
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.text);
+      doc.text(title, margin + 8, yPosition + 6);
 
-      currentY += isMobile ? 12 : 15;
+      yPosition += 15;
+    };
 
-      // Section content
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(contentFontSize);
-      doc.setTextColor(0, 0, 0);
+    // Helper: Render Key-Value Grid
+    const addGridContent = (data) => {
+      const colWidth = contentWidth / 2;
+      const rowHeight = 8;
+
+      doc.setFontSize(10);
 
       data.forEach((item, index) => {
-        // Alternate row colors
-        if (index % 2 === 0) {
-          doc.setFillColor(248, 249, 250);
-          doc.rect(margin, currentY - 2, contentWidth, isMobile ? 6 : 8, 'F');
+        // Estimate height needed (wrapping text)
+        const valueStr = String(item.value || "N/A");
+        const wrappedVal = doc.splitTextToSize(valueStr, colWidth - 45); // Value column width
+        const lines = wrappedVal.length;
+        const dynamicRowHeight = Math.max(rowHeight, lines * 5 + 4);
+
+        checkPageBreak(dynamicRowHeight);
+
+        // Calculate x position based on column (0 or 1)
+        const isLeftCol = index % 2 === 0;
+        const xBase = isLeftCol ? margin : margin + colWidth;
+
+        // Background for readability
+        if (index % 4 < 2) {
+          doc.setFillColor(250, 250, 250);
+          doc.rect(xBase, yPosition, colWidth - 2, dynamicRowHeight, 'F');
         }
 
         // Label
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(...secondaryColor);
-        doc.text(`${item.label}:`, margin + 2, currentY + (isMobile ? 2 : 3));
+        doc.setTextColor(...colors.secondary);
+        doc.text(item.label, xBase + 2, yPosition + 5);
 
         // Value
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(0, 0, 0);
-        const valueText = item.value || "N/A";
-        const maxWidth = contentWidth - 25;
-        const lines = doc.splitTextToSize(valueText, maxWidth);
+        doc.setTextColor(...colors.text);
+        doc.text(wrappedVal, xBase + 45, yPosition + 5);
 
-        lines.forEach((line, lineIndex) => {
-          doc.text(line, margin + 25, currentY + (isMobile ? 2 : 3) + (lineIndex * (isMobile ? 4 : 5)));
-        });
+        // If it's the right column or last item, move Y down
+        if (!isLeftCol || index === data.length - 1) {
+          // Only increment Y if we completed a row or it's the last odd item
+          // Note: simpler approach for grid is to just move Y every 2 items
+        }
 
-        currentY += Math.max(isMobile ? 7 : 8, lines.length * (isMobile ? 4 : 5));
+        // Better Grid approach: Move Y only after completing 2 items (row)
+        if (!isLeftCol) {
+          yPosition += dynamicRowHeight;
+        } else if (index === data.length - 1) {
+          yPosition += dynamicRowHeight; // Last item is alone on left
+        }
       });
 
-      // Section border
-      doc.setDrawColor(...accentColor);
-      doc.setLineWidth(0.3);
-      doc.line(margin, currentY + 2, pageWidth - margin, currentY + 2);
-
-      return currentY + (isMobile ? 8 : 10);
+      yPosition += 10; // Spacer after section
     };
 
-    const addFooter = () => {
-      const footerY = pageHeight - (isMobile ? 15 : 20);
-
-      // Footer line
-      doc.setDrawColor(...primaryColor);
-      doc.setLineWidth(0.5);
-      doc.line(0, footerY - 3, pageWidth, footerY - 3);
-
-      // Footer text
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(footerFontSize);
-      doc.setTextColor(...secondaryColor);
-
-      const generationDate = new Date().toLocaleDateString('en-IN');
-      const generationTime = new Date().toLocaleTimeString('en-IN');
-
-      doc.text(`Generated on: ${generationDate} at ${generationTime}`, margin, footerY);
-      doc.text(`Student ID: ${student.studentId || 'N/A'}`, pageWidth - margin, footerY, { align: "right" });
-
-      // Page number
-      doc.text("Page 1 of 1", pageWidth / 2, footerY, { align: "center" });
-    };
-
-    // Add header
+    // --- Start Generating ---
     addHeader();
-    yPosition = headerHeight + margin;
+    yPosition = headerHeight + 15;
 
-    // Student name highlight - responsive
+    // Student Header Info
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(isMobile ? 12 : 14);
-    doc.setTextColor(...primaryColor);
-    doc.text(`${student.candidateName}`, pageWidth / 2, yPosition, { align: "center" });
+    doc.setFontSize(18);
+    doc.setTextColor(...colors.primary);
+    doc.text(student.candidateName, margin, yPosition);
 
-    // Status badge - responsive sizing
-    const status = student.applicationStatus === "Enroll" ? "Enrolled" : student.applicationStatus;
-    const statusColor = status === "Enrolled" ? [46, 204, 113] : [230, 126, 34];
+    // Status Badge
+    const statusText = student.applicationStatus === "Enroll" ? "ENROLLED" : student.applicationStatus.toUpperCase();
+    const badgeColor = student.applicationStatus === "Enroll" ? [46, 204, 113] : [230, 126, 34];
 
-    const badgeWidth = isMobile ? 25 : 30;
-    const badgeHeight = isMobile ? 6 : 8;
-    doc.setFillColor(...statusColor);
-    doc.rect(pageWidth / 2 - (badgeWidth / 2), yPosition + (isMobile ? 3 : 5), badgeWidth, badgeHeight, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(isMobile ? 6 : 8);
-    doc.text(status, pageWidth / 2, yPosition + (isMobile ? 8 : 10), { align: "center" });
+    doc.setFontSize(10);
+    doc.setTextColor(...colors.white);
+    const badgeWidth = doc.getTextWidth(statusText) + 10;
 
-    yPosition += isMobile ? 18 : 25;
+    doc.setFillColor(...badgeColor);
+    doc.rect(pageWidth - margin - badgeWidth, yPosition - 6, badgeWidth, 8, 'F');
+    doc.text(statusText, pageWidth - margin - badgeWidth + 5, yPosition);
 
-    // Personal Information Section
+    yPosition += 15;
+
+    // Sections
     const personalInfo = [
       { label: "Student ID", value: student.studentId },
-      { label: "Phone Number", value: student.candidateNumber },
-      { label: "Date of Birth", value: student.dob },
-      { label: "Father's Name", value: student.fatherName },
-      { label: "Parent's Number", value: student.parentNumber },
       { label: "Gender", value: student.gender },
-      { label: "Aadhaar Number", value: student.adhaarNumber },
+      { label: "Phone", value: student.candidateNumber },
+      { label: "DOB", value: student.dob },
+      { label: "Father's Name", value: student.fatherName },
+      { label: "Parent's Phone", value: student.parentNumber },
+      { label: "Aadhaar", value: student.adhaarNumber },
       { label: "Place", value: student.place }
     ];
 
-    yPosition = addSection("Personal Information", personalInfo, yPosition);
+    addSectionTitle("Personal Details");
+    addGridContent(personalInfo);
 
-    // Academic Information Section
     const academicInfo = [
       { label: "College", value: student.college },
       { label: "Course", value: student.course }
     ];
 
-    yPosition = addSection("Academic Information", academicInfo, yPosition);
+    addSectionTitle("Academic Information");
+    addGridContent(academicInfo);
 
-    // Financial Information Section
     const financialInfo = [
       { label: "Amount Paid", value: student.amountPaid },
       { label: "Transaction ID", value: student.transactionId }
     ];
 
-    yPosition = addSection("Financial Information", financialInfo, yPosition);
+    addSectionTitle("Financial Details");
+    addGridContent(financialInfo);
 
-    // Reference Information Section
-    const referenceInfo = [
-      { label: "Reference Person", value: student.reference?.userName },
+    const extraInfo = [
+      { label: "Reference", value: student.reference?.userName },
       { label: "Consultancy", value: student.reference?.consultancyName },
       { label: "Created At", value: student.createdAt }
     ];
 
-    yPosition = addSection("Reference & Creation Info", referenceInfo, yPosition);
+    addSectionTitle("Reference & Audit");
+    addGridContent(extraInfo);
 
-    // Add footer
-    addFooter();
+    // Finalize
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      addFooter(i);
+    }
 
-    // Save the PDF
-    doc.save(`${student.candidateName}_details.pdf`);
+    doc.save(`${student.candidateName}_profile.pdf`);
   };
 
   // Details Modal Content
@@ -966,12 +994,12 @@ const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
         )}
       </main>
 
-      {showEditModal && 
-      <EditModal 
-      selectedStudent={selectedStudent}
-      setShowEditModal={setShowEditModal}
-      isSaving={isSaving}
-      />}
+      {showEditModal &&
+        <EditModal
+          selectedStudent={selectedStudent}
+          setShowEditModal={setShowEditModal}
+          isSaving={isSaving}
+        />}
       {showDetailsModal && <DetailsModal />}
     </div>
   );
