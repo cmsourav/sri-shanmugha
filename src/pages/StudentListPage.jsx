@@ -10,6 +10,7 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
 import "../styles/StudentList.css";
+import jsPDF from "jspdf";
 
 const StudentList = () => {
   // State variables
@@ -24,7 +25,6 @@ const StudentList = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 8;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async (user) => {
@@ -56,7 +56,7 @@ const StudentList = () => {
           };
         });
         setStudents(list);
-      } catch (err) {
+      } catch {
         setError("Failed to load student data.");
       } finally {
         setIsLoading(false);
@@ -158,8 +158,6 @@ const StudentList = () => {
   // Edit Modal Content
 // Edit Modal Content
 const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
-  if (!selectedStudent) return null; 
-
   const [localStudent, setLocalStudent] = useState(selectedStudent);
   const [collegeOptions, setCollegeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
@@ -196,6 +194,8 @@ const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
       setLocalStudent(selectedStudent);
     }
   }, [selectedStudent]);
+
+  if (!selectedStudent) return null;
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -491,6 +491,204 @@ const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
   );
 };
 
+  // PDF Generation Function
+  const generateStudentPDF = (student) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    
+    // Detect mobile device
+    const isMobile = window.innerWidth <= 768;
+    
+    // Adjust dimensions for mobile
+    const margin = isMobile ? 10 : 15;
+    const headerHeight = isMobile ? 30 : 35;
+    const contentWidth = pageWidth - (margin * 2);
+    
+    let yPosition = margin;
+
+    // Colors
+    const primaryColor = [41, 128, 185]; // Blue
+    const secondaryColor = [52, 73, 94]; // Dark gray
+    const accentColor = [155, 89, 182]; // Purple
+    const lightGray = [236, 240, 241];
+
+    // Font sizes adjusted for mobile
+    const titleFontSize = isMobile ? 16 : 18;
+    const subtitleFontSize = isMobile ? 10 : 12;
+    const sectionFontSize = isMobile ? 11 : 14;
+    const contentFontSize = isMobile ? 9 : 10;
+    const footerFontSize = isMobile ? 7 : 8;
+
+    // Helper functions
+    const addHeader = () => {
+      // Header background
+      doc.setFillColor(...lightGray);
+      doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+      // Company title - responsive sizing
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(titleFontSize);
+      doc.setTextColor(...primaryColor);
+      doc.text("Sri Shanmugha Educational Services", pageWidth / 2, 12, { align: "center" });
+
+      // Subtitle
+      doc.setFontSize(subtitleFontSize);
+      doc.setTextColor(...secondaryColor);
+      doc.text("Student Information Report", pageWidth / 2, isMobile ? 22 : 25, { align: "center" });
+
+      // Header border
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(0.5);
+      doc.line(0, headerHeight, pageWidth, headerHeight);
+    };
+
+    const addSection = (title, data, startY) => {
+      let currentY = startY;
+
+      // Section title with background
+      doc.setFillColor(...primaryColor);
+      doc.rect(margin, currentY - 2, contentWidth, isMobile ? 8 : 10, 'F');
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(sectionFontSize - 1);
+      doc.setTextColor(255, 255, 255);
+      doc.text(title, margin + 3, currentY + (isMobile ? 3 : 4));
+
+      currentY += isMobile ? 12 : 15;
+
+      // Section content
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(contentFontSize);
+      doc.setTextColor(0, 0, 0);
+
+      data.forEach((item, index) => {
+        // Alternate row colors
+        if (index % 2 === 0) {
+          doc.setFillColor(248, 249, 250);
+          doc.rect(margin, currentY - 2, contentWidth, isMobile ? 6 : 8, 'F');
+        }
+
+        // Label
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...secondaryColor);
+        doc.text(`${item.label}:`, margin + 2, currentY + (isMobile ? 2 : 3));
+
+        // Value
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+        const valueText = item.value || "N/A";
+        const maxWidth = contentWidth - 25;
+        const lines = doc.splitTextToSize(valueText, maxWidth);
+
+        lines.forEach((line, lineIndex) => {
+          doc.text(line, margin + 25, currentY + (isMobile ? 2 : 3) + (lineIndex * (isMobile ? 4 : 5)));
+        });
+
+        currentY += Math.max(isMobile ? 7 : 8, lines.length * (isMobile ? 4 : 5));
+      });
+
+      // Section border
+      doc.setDrawColor(...accentColor);
+      doc.setLineWidth(0.3);
+      doc.line(margin, currentY + 2, pageWidth - margin, currentY + 2);
+
+      return currentY + (isMobile ? 8 : 10);
+    };
+
+    const addFooter = () => {
+      const footerY = pageHeight - (isMobile ? 15 : 20);
+
+      // Footer line
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(0.5);
+      doc.line(0, footerY - 3, pageWidth, footerY - 3);
+
+      // Footer text
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(footerFontSize);
+      doc.setTextColor(...secondaryColor);
+
+      const generationDate = new Date().toLocaleDateString('en-IN');
+      const generationTime = new Date().toLocaleTimeString('en-IN');
+
+      doc.text(`Generated on: ${generationDate} at ${generationTime}`, margin, footerY);
+      doc.text(`Student ID: ${student.studentId || 'N/A'}`, pageWidth - margin, footerY, { align: "right" });
+
+      // Page number
+      doc.text("Page 1 of 1", pageWidth / 2, footerY, { align: "center" });
+    };
+
+    // Add header
+    addHeader();
+    yPosition = headerHeight + margin;
+
+    // Student name highlight - responsive
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(isMobile ? 12 : 14);
+    doc.setTextColor(...primaryColor);
+    doc.text(`${student.candidateName}`, pageWidth / 2, yPosition, { align: "center" });
+
+    // Status badge - responsive sizing
+    const status = student.applicationStatus === "Enroll" ? "Enrolled" : student.applicationStatus;
+    const statusColor = status === "Enrolled" ? [46, 204, 113] : [230, 126, 34];
+
+    const badgeWidth = isMobile ? 25 : 30;
+    const badgeHeight = isMobile ? 6 : 8;
+    doc.setFillColor(...statusColor);
+    doc.rect(pageWidth / 2 - (badgeWidth / 2), yPosition + (isMobile ? 3 : 5), badgeWidth, badgeHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(isMobile ? 6 : 8);
+    doc.text(status, pageWidth / 2, yPosition + (isMobile ? 8 : 10), { align: "center" });
+
+    yPosition += isMobile ? 18 : 25;
+
+    // Personal Information Section
+    const personalInfo = [
+      { label: "Student ID", value: student.studentId },
+      { label: "Phone Number", value: student.candidateNumber },
+      { label: "Date of Birth", value: student.dob },
+      { label: "Father's Name", value: student.fatherName },
+      { label: "Parent's Number", value: student.parentNumber },
+      { label: "Gender", value: student.gender },
+      { label: "Aadhaar Number", value: student.adhaarNumber },
+      { label: "Place", value: student.place }
+    ];
+
+    yPosition = addSection("Personal Information", personalInfo, yPosition);
+
+    // Academic Information Section
+    const academicInfo = [
+      { label: "College", value: student.college },
+      { label: "Course", value: student.course }
+    ];
+
+    yPosition = addSection("Academic Information", academicInfo, yPosition);
+
+    // Financial Information Section
+    const financialInfo = [
+      { label: "Amount Paid", value: student.amountPaid },
+      { label: "Transaction ID", value: student.transactionId }
+    ];
+
+    yPosition = addSection("Financial Information", financialInfo, yPosition);
+
+    // Reference Information Section
+    const referenceInfo = [
+      { label: "Reference Person", value: student.reference?.userName },
+      { label: "Consultancy", value: student.reference?.consultancyName },
+      { label: "Created At", value: student.createdAt }
+    ];
+
+    yPosition = addSection("Reference & Creation Info", referenceInfo, yPosition);
+
+    // Add footer
+    addFooter();
+
+    // Save the PDF
+    doc.save(`${student.candidateName}_details.pdf`);
+  };
+
   // Details Modal Content
   const DetailsModal = () => (
     <div className="modal modal--details">
@@ -619,6 +817,15 @@ const EditModal = ({ selectedStudent, setShowEditModal, isSaving }) => {
           </div>
         </div>
         <div className="modal__footer">
+          <button
+            className="button button--outline"
+            onClick={() => generateStudentPDF(selectedStudent)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2ZM16 18H8V16H16V18ZM16 14H8V12H16V14ZM13 9V3.5L18.5 9H13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Download PDF
+          </button>
           <button
             className="button button--primary"
             onClick={() => setShowDetailsModal(false)}

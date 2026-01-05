@@ -739,11 +739,22 @@ h1, h2, h3, h4 {
   }
 
   .modal__footer {
-    padding: 1rem;
+    padding: 1.25rem;
     position: sticky;
     bottom: 0;
     background: white;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .modal__footer .button {
+    flex: 1;
+    min-height: 44px; /* Reduced from 52px for better proportion */
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
   }
 
   /* Form improvements */
@@ -806,10 +817,43 @@ h1, h2, h3, h4 {
     font-size: 1.25rem;
   }
 
-  /* Button sizing */
-  .button {
-    padding: 0.875rem 1rem;
+  .modal__footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .modal__footer .button {
     width: 100%;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    min-height: 44px; /* Reduced from 56px */
+    border-radius: 8px;
+  }
+
+  /* Enhanced mobile button experience */
+  .button {
+    -webkit-tap-highlight-color: rgba(67, 97, 238, 0.2);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: all 0.2s ease;
+    min-height: 44px; /* Consistent minimum height */
+  }
+
+  .button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  .button--primary {
+    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+  }
+
+  .button--outline {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   /* Form inputs */
@@ -851,5 +895,16 @@ h1, h2, h3, h4 {
 
   .modal__content {
     padding: 0.75rem;
+  }
+
+  .modal__footer {
+    padding: 1rem;
+  }
+
+  .modal__footer .button {
+    min-height: 44px; /* Reduced from 60px for better proportion */
+    font-size: 1rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 8px;
   }
 }
